@@ -81,7 +81,7 @@ function vex()
         local spell = mySpells:selectSpell('q')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * .70) + currentBase
+            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
         end
         return spell.TotalDamage
     end
@@ -91,7 +91,7 @@ function vex()
         local spell = mySpells:selectSpell('w')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * .30) + currentBase
+            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
         end
         return spell.TotalDamage
     end
@@ -101,7 +101,7 @@ function vex()
         local spell = mySpells:selectSpell('e')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * .70) + currentBase
+            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[spell.Level]) + currentBase
         end
         return spell.TotalDamage
     end
@@ -111,8 +111,8 @@ function vex()
         local spell = mySpells:selectSpell('r')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * .20) + currentBase
-            spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * .50) + currentBase
+            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
+            spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
         end
         return spell.TotalDamage
     end
