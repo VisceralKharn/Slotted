@@ -10,6 +10,7 @@ function vex()
     function mySpells:getSpells()
         self.spells = {
             q = {
+                apRatio = .7
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
@@ -18,6 +19,7 @@ function vex()
                 CastTime = 0.15,
                 TotalDamage = 0 },
             w = {
+                apRatio = .3
                 Range = 0,
                 Width = 550,
                 Speed = 10000,
@@ -26,6 +28,7 @@ function vex()
                 CastTime = 0.15,
                 TotalDamage = 0 },
             e = {
+                apRation = {.4,.45,.5,.55,.6}
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
@@ -34,6 +37,7 @@ function vex()
                 CastTime = 0.15,
                 TotalDamage = 0 },
             r = {
+                apRatio = {.2, .5}
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
