@@ -97,54 +97,30 @@ function vex()
     end
 
 
-    function mySpells:getQDamage()
-        local spell = mySpells:selectSpell('q')
-        if spell.Base[spell.Level] ~= nil then
+    function mySpells:getSpellDamage(spell)
+        local spell = mySpells:selectSpell(spell)
+        if spell.Base[spell.Level] ~= nil or spell.Base[spell.Level] ~= 0 then
             local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
+            if spell ~= 'r' then
+                spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
+            end
+            if spell == 'r' then
+                spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
+                spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
+            end
         end
         return self.spell.TotalDamage
     end
 
-
-    function mySpells:getWDamage()
-        local spell = mySpells:selectSpell('w')
-        if spell.Base[spell.Level] ~= nil then
-            local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
-        end
-        return self.spell.TotalDamage
-    end
-
-
-    function mySpells:getEDamage()
-        local spell = mySpells:selectSpell('e')
-        if spell.Base[spell.Level] ~= nil then
-            local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[spell.Level]) + currentBase
-        end
-        return self.spell.TotalDamage
-    end
-
-
-    function mySpells:getRDamage()
-        local spell = mySpells:selectSpell('r')
-        if spell.Base[spell.Level] ~= nil then
-            local currentBase = spell.Base[spell.Level]
-            spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
-            spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
-
-        end
-        return self.spell.TotalDamage
-    end
 
 
     function mySpells:currentTotalComboDamage()
         local totalComboDamage = 0
         for k,v in self.mySpells do
             spellValues, spellSlot, spellState = mySpells:selectSpell(k)
+            self.spellValues.TotalDamage = getSpellDamage(k)
             if spellState.ready and spellState.valid then
-                self.totalComboDamage = totalComboDamage + spellValues.TotalDamage
+                self.totalComboDamage = totalComboDamage + self.spellValues.TotalDamage
             end
         end
         return self.totalComboDamage
