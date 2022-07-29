@@ -6,68 +6,87 @@ local myChampSpellBook = myChamp:get_spell_book()
 
 function vex()
 
-    local mySpells = {}
-    function mySpells:getSpells()
-        self.spells = {
+    local mySpells = {
             q = {
-                apRatio = .7
+                apRatio = .7,
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
-                Level = myChampSpellBook:get_spell_slot(e_spell_slot.q).level,
+                --Level = myChampSpellBook:get_spell_slot(e_spell_slot.q).level,
+                Level = 0,
                 Base = {60, 105, 150, 195, 240},
                 CastTime = 0.15,
                 TotalDamage = 0 },
             w = {
-                apRatio = .3
+                apRatio = .3,
                 Range = 0,
                 Width = 550,
                 Speed = 10000,
-                Level = myChampSpellBook:get_spell_slot(e_spell_slot.w).level,
+                --Level = myChampSpellBook:get_spell_slot(e_spell_slot.w).level,
+                Level = 0,
                 Base = {60, 105, 150, 195, 240},
                 CastTime = 0.15,
                 TotalDamage = 0 },
             e = {
-                apRation = {.4,.45,.5,.55,.6}
+                apRation = {.4,.45,.5,.55,.6},
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
-                Level = myChampSpellBook:get_spell_slot(e_spell_slot.e).level,
+                --Level = myChampSpellBook:get_spell_slot(e_spell_slot.e).level,
+                Level = 0,
                 Base = {60, 105, 150, 195, 240},
                 CastTime = 0.15,
                 TotalDamage = 0 },
             r = {
-                apRatio = {.2, .5}
+                apRatio = {.2, .5},
                 Range = 1200,
                 Width = 360,
                 Speed = 1600,
-                Level = myChampSpellBook:get_spell_slot(e_spell_slot.r).level,
+                --Level = myChampSpellBook:get_spell_slot(e_spell_slot.r).level,
+                Level = 0,
                 Base = {60, 105, 150, 195, 240},
                 CastTime = 0.15,
                 TotalDamage = 0 },
             }
-            return self.spells
-        end
+
+
 
     function mySpells:selectSpell(spell)
         if spell == 'q' then
-            local selectedSpell = self.spells.q
+            local spellValues = self.spells.q
+            local spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.q)
+            self.spells.q.Level = spellSlot.level
+
         end
         if spell == 'w' then
-            local selectedSpell = self.spells.w
+            local spellValues = self.spells.w
+            local spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.w)
+            self.spells.w.Level = spellSlot.level
         end
         if spell == 'e' then
-            local selectedSpell = self.spells.e
+            local spellValues = self.spells.e
+            local spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.e)
+            self.spells.e.Level = spellSlot.level
         end
         if spell == 'r' then
-            local selectedSpell = self.spells.r
+            local spellValues = self.spells.r
+            local spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.r)
+            self.spells.r.Level = spellSlot.level
         end
-        return selectedSpell
+
+        spellState = {
+            valid = spellSlot:is_valid(),
+            cooldown = spellSlot:get_cooldown(),
+            ready = spellSlot:is_ready()
+        }
+
+        return spellValues, spellSlot, spellState
     end
 
+
     function mySpells:InSpellRange(spell)
-        selectedSpell = mySpells:selectSpell(spell)
-        enemiesList = {}
+        local selectedSpell = mySpells:selectSpell(spell)
+        local enemiesList = {}
         for i,v in ipairs(features.entity_list:get_enemies()) do
             if v ~= nil and v:is_alive() and v.position:dist_to(myChamp.position) <= selectedSpell.Range then
                 enemiesList.insert(v)
@@ -76,56 +95,69 @@ function vex()
         return enemiesList
     end
 
+
     function mySpells:getQDamage()
-        mySpells:getSpells()
         local spell = mySpells:selectSpell('q')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
             spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
         end
-        return spell.TotalDamage
+        return self.spell.TotalDamage
     end
 
+
     function mySpells:getWDamage()
-        mySpells:getSpells()
         local spell = mySpells:selectSpell('w')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
             spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
         end
-        return spell.TotalDamage
+        return self.spell.TotalDamage
     end
 
+
     function mySpells:getEDamage()
-        mySpells:getSpells()
         local spell = mySpells:selectSpell('e')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
             spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[spell.Level]) + currentBase
         end
-        return spell.TotalDamage
+        return self.spell.TotalDamage
     end
 
+
     function mySpells:getRDamage()
-        mySpells:getSpells()
         local spell = mySpells:selectSpell('r')
         if spell.Base[spell.Level] ~= nil then
             local currentBase = spell.Base[spell.Level]
             spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
             spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
+
         end
-        return spell.TotalDamage
+        return self.spell.TotalDamage
     end
 
+
+    function mySpells:currentTotalComboDamage()
+        local totalComboDamage = 0
+        for k,v in self.mySpells do
+            spellValues, spellSlot, spellState = mySpells:selectSpell(k)
+            if spellState.ready and spellState.valid then
+                local totalComboDamage = totalComboDamage + spellValues.TotalDamage
+            end
+        end
+        return totalComboDamage
+    end
 
 
     function mySpells:getTargetQDamage(target)
-        currentTotalQDamage = mySpells:getQDamage()
+        local currentTotalQDamage = mySpells:getQDamage()
 
     end
 
+
     cheat.register_callback("render", function()
-        g_render:text(vec2:new(150, 50), color:new(255, 255, 255), tostring(mySpells:getQDamage()), "roboto-regular", 60)
+        g_render:text(vec2:new(150, 50), color:new(255, 255, 255), tostring(mySpells:currentTotalComboDamage()), "roboto-regular", 60)
     end)
 end
 
