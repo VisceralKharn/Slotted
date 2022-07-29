@@ -7,6 +7,7 @@ local myChampSpellBook = myChamp:get_spell_book()
 function vex()
 
     local mySpells = {
+        totalComboDamage = 0,
             q = {
                 apRatio = .7,
                 Range = 1200,
@@ -143,10 +144,10 @@ function vex()
         for k,v in self.mySpells do
             spellValues, spellSlot, spellState = mySpells:selectSpell(k)
             if spellState.ready and spellState.valid then
-                local totalComboDamage = totalComboDamage + spellValues.TotalDamage
+                self.totalComboDamage = totalComboDamage + spellValues.TotalDamage
             end
         end
-        return totalComboDamage
+        return self.totalComboDamage
     end
 
 
