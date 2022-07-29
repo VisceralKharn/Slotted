@@ -88,7 +88,7 @@ function vex()
     function mySpells:InSpellRange(spell)
         local selectedSpell = mySpells:selectSpell(spell)
         local enemiesList = {}
-        for i,v in ipairs(features.entity_list:get_enemies()) do
+        for k,v in ipairs(features.entity_list:get_enemies()) do
             if v ~= nil and v:is_alive() and v.position:dist_to(myChamp.position) <= selectedSpell.Range then
                 enemiesList.insert(v)
             end
@@ -102,11 +102,11 @@ function vex()
         if spell.Base[spell.Level] ~= nil or spell.Base[spell.Level] ~= 0 then
             local currentBase = spell.Base[spell.Level]
             if spell ~= 'r' then
-                spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
+                self.spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio) + currentBase
             end
             if spell == 'r' then
-                spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
-                spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
+                self.spell.TotalDamage = ( myChamp:get_ability_power() * spell.apRatio[0]) + currentBase
+                self.spell.TotalDamage = spell.TotalDamage + ( myChamp:get_ability_power() * spell.apRatio[1]) + currentBase
             end
         end
         return self.spell.TotalDamage
@@ -117,17 +117,19 @@ function vex()
     function mySpells:currentTotalComboDamage()
         local totalComboDamage = 0
         for k,v in self.mySpells do
-            spellValues, spellSlot, spellState = mySpells:selectSpell(k)
-            self.spellValues.TotalDamage = getSpellDamage(k)
-            if spellState.ready and spellState.valid then
-                self.totalComboDamage = totalComboDamage + self.spellValues.TotalDamage
+            if k:len() == 1 then
+                spellValues, spellSlot, spellState = mySpells:selectSpell(k)
+                spellValues.TotalDamage = getSpellDamage(k)
+                if spellState.ready and spellState.valid then
+                    self.totalComboDamage = totalComboDamage + self.spellValues.TotalDamage
+                end
             end
         end
         return self.totalComboDamage
     end
 
 
-    function mySpells:getTargetQDamage(target)
+    function mySpells:getTargetDamage(target)
         local currentTotalQDamage = mySpells:getQDamage()
 
     end
