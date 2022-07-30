@@ -5,8 +5,8 @@ print('vex loaded')
 
 function createEnemiesList()
     local enemiesList = {}
-    for _,v in pairs(features.entity_list:get_enemies()) do
-        enemiesList.insert(v)
+    for k,v in pairs(features.entity_list:get_enemies()) do
+        table.insert(enemiesList, v)
     end
     return enemiesList
 end
@@ -147,7 +147,7 @@ function vex()
         local enemiesList = {}
         for k,v in ipairs(features.entity_list:get_enemies()) do
             if v ~= nil and v:is_alive() and self:isSpellInRange(spell, v) then
-                enemiesList.insert(v)
+                table.insert(enemiesList, v)
             end
         end
         return enemiesList
@@ -159,7 +159,8 @@ function vex()
         for _, v in pairs(spellsList) do
                --local selectedSpell, spellSlot = self:selectSpell(v)
             if self:isSpellInRange(v,target) and spellSlot:is_ready() then
-                eligibleSpells.insert(v)
+
+                table.insert(eligibleSpells, v)
             end
            end
         return eligibleSpells
@@ -167,23 +168,25 @@ function vex()
 
 
     function mySpells:checkIfSpellListKillsATarget(target)
-        for _,v in self:spellsInRangeOfTarget(target) do
+        for _,v in pairs(self:spellsInRangeOfTarget(target)) do
             local totalDps = 0
             local spellsToCast = {}
             local targetHp = target.health
+            print(targetHp)
             if self:getSpellDamageToTarget(v,target) > targetHp then
                 print("Spell "..v.."can kill, cast")
-                myChamp:cast_spell((self[v].spell), target.position)
+                self:castSpellOnTarget((self[v].spell), target.position)
             elseif totalDps > targetHp then
                 for _,v in pairs(totalDps) do
-                    myChamp:cast_spell((self[v].spell), target.position)
+                    self:castSpellOnTarget((self[v].spell), target.position)
                 end
             else
-                totalDps.insert(self:getSpellDamageToTarget(v,target))
-                spellsToCast.insert(v)
+
+                totalDps = totalDps + self:getSpellDamageToTarget(v,target)
+                table.insert(spellsToCast, v)
             end
         end
-
+        print(totalDps)
     end
 
     function mySpells:CheckIfSpellListKillsATargetInEnemyList()
@@ -215,26 +218,25 @@ function vex()
 
 
 
+    function mySpells:castSpellOnTarget(spellToCast,target)
+        self.selectSpell('q')
+        local castSpellSlot = self[spellToCast].spell
+        print(castSpellSlot)
+        g_input:cast_spell((castSpellSlot), target.position)
+    end
 
 
 
-    --function mySpells:fullComboKillableEnemiesInRange()
-    --    local killableEnemies = {}
-    --
-    --    for _,v in pairs(self:enemiesInSpellRange('r')) do
-    --        local enemyHp = v.health
-    --        if enemyHp < self.getComboTargetDamage(v) then
-    --            killableEnemies.insert(v)
-    --        end
-    --    end
-    --    return killableEnemies
-    --end
+    for k,v in pairs(createEnemiesList()) do
+        --mySpells:castSpellOnTarget('q',v)
+        mySpells:CheckIfSpellListKillsATargetInEnemyList()
+    end
 
 
 
-    cheat.register_callback("render", function()
-        g_render:text(vec2:new(150, 50), color:new(255, 255, 255), tostring(mySpells:CheckIfSpellListKillsATargetInEnemyList()), "roboto-regular", 60)
-    end)
+    --cheat.register_callback("render", function()
+    --    g_render:text(vec2:new(150, 50), color:new(255, 255, 255), mySpells:CheckIfSpellListKillsATargetInEnemyList(), "roboto-regular", 60)
+    --end)
 
 end
 
