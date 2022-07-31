@@ -1,5 +1,6 @@
 print('vex loaded')
 
+
 --g_input:cast_spell((test.spell), nil)
 function createEnemiesList()
     local enemiesList = {}
@@ -22,6 +23,8 @@ function vex()
 
     local mySpells = {
         q = {
+            lastCast = 0,
+            manaCost = {45,50,55,60,65},
             spell = e_spell_slot.q,
             apRatio = .7,
             Range = 1200,
@@ -33,6 +36,8 @@ function vex()
             coolDown = {8 , 7 , 6 , 5 , 4},
             TotalDamage = 0 },
         w = {
+            lastCast = 0,
+            manaCost = {75,75,75,75,75},
             spell = e_spell_slot.w,
             apRatio = .3,
             Range = 0,
@@ -43,6 +48,8 @@ function vex()
             CastTime = 0.25,
             TotalDamage = 0 },
         e = {
+            lastCast = 0,
+            manaCost = {70,80,90,100,110},
             spell = e_spell_slot.e,
             apRatio = {.4,.45,.5,.55,.6},
             Range = 1200,
@@ -53,6 +60,8 @@ function vex()
             CastTime = 0.15,
             TotalDamage = 0 },
         r = {
+            lastCast = 0,
+            manaCost = {100, 100, 100},
             spell = e_spell_slot.r,
             apRatio = {.2, .5},
             Range = { 2000, 2500, 3000 },
@@ -184,16 +193,38 @@ function vex()
 
 
     function mySpells:isSpellReady(spell)
-        return self[spell].spell:is_ready()
+            if self[spell].spell:is_ready() then
+                return true
+            else
+                return false
+            end
+    end
+
+    function mySpells:haveEnoughMana(spell)
+        if myChamp.mana >= self[spell].manaCost[self[spell].Level] then
+            return true
+        else
+            return false
+        end
+    end
+
+    function mySpells:canCast(spell)
+        if self:isSpellReady(spell) and self:haveEnoughMana(spell) then
+            return true
+        else
+            return false
+        end
     end
 
     function mySpells:castSpellOnTarget(spellToCast,target)
-        local castSpellSlot = self[spellToCast].spell
-        print('casting spell '..spellToCast)
-        if target ~= nil then
-            g_input:cast_spell((castSpellSlot), target.position)
-        else
-            g_input:cast_spell(castSpellSlot)
+        if self:canCast(spellToCast) then
+                local castSpellSlot = self[spellToCast].spell
+                print('casting spell '..spellToCast)
+                if target ~= nil then
+                    g_input:cast_spell((castSpellSlot), target.position)
+                else
+                    g_input:cast_spell(castSpellSlot)
+                end
         end
     end
 
@@ -230,7 +261,10 @@ function vex()
                             print('in R range')
                             for _,vSpell in pairs(spellsList)
                             do
-                                totalDamageToTarget = totalDamageToTarget + mySpells:getSpellDamageToTarget(vSpell,vTarget)
+                                if mySpells:isSpellReady(vSpell) then
+                                    totalDamageToTarget = totalDamageToTarget + mySpells:getSpellDamageToTarget(vSpell,vTarget)
+
+                                end
                             end
                             print('total damage done to target '..totalDamageToTarget)
                             if totalDamageToTarget > vTarget.health then
