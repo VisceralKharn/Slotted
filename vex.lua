@@ -1,8 +1,6 @@
-
 print('vex loaded')
 
 --g_input:cast_spell((test.spell), nil)
-
 function createEnemiesList()
     local enemiesList = {}
     for k,v in pairs(features.entity_list:get_enemies()) do
@@ -29,7 +27,6 @@ function vex()
             Range = 1200,
             Width = 360,
             Speed = 1600,
-            --Level = myChampSpellBook:get_spell_slot(e_spell_slot.q).level,
             Level = 0,
             Base = {60, 105, 150, 195, 240},
             CastTime = 0.15,
@@ -41,7 +38,6 @@ function vex()
             Range = 0,
             Width = 550,
             Speed = 10000,
-            --Level = myChampSpellBook:get_spell_slot(e_spell_slot.w).level,
             Level = 0,
             Base = {80, 120, 160, 200, 240},
             CastTime = 0.25,
@@ -52,7 +48,6 @@ function vex()
             Range = 1200,
             Width = 360,
             Speed = 1600,
-            --Level = myChampSpellBook:get_spell_slot(e_spell_slot.e).level,
             Level = 0,
             Base = {50, 70, 90, 110, 130},
             CastTime = 0.15,
@@ -60,10 +55,9 @@ function vex()
         r = {
             spell = e_spell_slot.r,
             apRatio = {.2, .5},
-            Range = 1200,
+            Range = { 2000, 2500, 3000 },
             Width = 360,
             Speed = 1600,
-            --Level = myChampSpellBook:get_spell_slot(e_spell_slot.r).level,
             Level = 0,
             Base = {75 , 125 , 175 },
             Base2 = {150 , 250 , 350},
@@ -73,54 +67,38 @@ function vex()
     }
 
 
-    function mySpells:selectSpell(spellKey)
-        if spellKey == 'q' then
-            spellValues = self.q
-            spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.q)
-            self.q.Level = spellSlot.level
-        end
-        if spellKey == 'w' then
-            spellValues = self.w
-            spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.w)
-            self.w.Level = spellSlot.level
-        end
-        if spellKey == 'e' then
-            spellValues = self.e
-            spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.e)
-            self.e.Level = spellSlot.level
-        end
-        if spellKey == 'r' then
-            spellValues = self.r
-            spellSlot = myChampSpellBook:get_spell_slot(e_spell_slot.r)
-            self.r.Level = spellSlot.level
-        end
 
 
-        return spellValues, spellSlot
+
+    function mySpells:refreshSpells()
+        self['q'].Level = myChampSpellBook:get_spell_slot(e_spell_slot.q).level
+        self['w'].Level = myChampSpellBook:get_spell_slot(e_spell_slot.w).level
+        self['e'].Level = myChampSpellBook:get_spell_slot(e_spell_slot.e).level
+        self['r'].Level = myChampSpellBook:get_spell_slot(e_spell_slot.r).level
     end
 
 
     function mySpells:getSpellDamage(spell)
-        local selectedSpell = self:selectSpell(spell)
-        local selectedLevel = selectedSpell.Level
-        local currentBase = selectedSpell.Base[selectedLevel]
+        self:refreshSpells()
+        local selectedLevel = self[spell].Level
+        local currentBase = self[spell].Base[selectedLevel]
 
         if spell ~= 'r' and spell ~= 'e' then
-            self[spell].TotalDamage = ( myChamp:get_ability_power() * selectedSpell.apRatio) + currentBase
+            self[spell].TotalDamage = ( myChamp:get_ability_power() * self[spell].apRatio) + currentBase
         end
 
 
         if spell == 'e' then
-            self[spell].TotalDamage = ( myChamp:get_ability_power() * selectedSpell.apRatio[selectedSpell.Level]) + currentBase
+            self[spell].TotalDamage = ( myChamp:get_ability_power() * self[spell].apRatio[self[spell].Level]) + currentBase
         end
 
         if spell == 'r' then
 
-            self[spell].TotalDamage = ( myChamp:get_ability_power() * selectedSpell.apRatio[1]) + currentBase
+            self[spell].TotalDamage = ( myChamp:get_ability_power() * self[spell].apRatio[1]) + currentBase
 
-            local Base2 = selectedSpell.Base2[selectedLevel]
+            local Base2 = self[spell].Base2[selectedLevel]
 
-            self[spell].TotalDamage = self[spell].TotalDamage  + ( myChamp:get_ability_power() * selectedSpell.apRatio[2]) + Base2
+            self[spell].TotalDamage = self[spell].TotalDamage  + ( myChamp:get_ability_power() * self[spell].apRatio[2]) + Base2
         end
 
         return self[spell].TotalDamage
@@ -133,17 +111,27 @@ function vex()
 
 
     function mySpells:isSpellInRange(spell,target)
-        local selectedSpell = self:selectSpell(spell)
-        if target.position:dist_to(myChamp.position) <= selectedSpell.Range then
-            return true
-        else
-            return false
+        if spell ~= 'r' then
+            if target.position:dist_to(myChamp.position) <= self[spell].Range then
+                return true
+            else
+                return false
+            end
         end
+        if spell == 'r' then
+            local rLevel = self[spell].Level
+            print('printing r spell range '..self[spell].Range[rLevel])
+            if target.position:dist_to(myChamp.position) <= self[spell].Range[rLevel] then
+                return true
+            else
+                return false
+            end
+        end
+
     end
 
 
-    function mySpells:enemiesListInSpellRange(spell)
-        local selectedSpell = self:selectSpell(spell)
+    function mySpells:listOfEnemiesInSpellRange(spell)
         local enemiesList = {}
         for k,v in ipairs(features.entity_list:get_enemies()) do
             if v ~= nil and v:is_alive() and self:isSpellInRange(spell, v) then
@@ -157,9 +145,8 @@ function vex()
     function mySpells:spellsInRangeOfTarget(target)
         local eligibleSpells = {}
         for _, v in pairs(spellsList) do
-               --local selectedSpell, spellSlot = self:selectSpell(v)
-            if self:isSpellInRange(v,target) and spellSlot:is_ready() then
-
+               --local self[spell], spellSlot = self:selectSpell(v)
+            if self:isSpellInRange(v,target) and self:isSpellReady(v) then
                 table.insert(eligibleSpells, v)
             end
            end
@@ -167,9 +154,11 @@ function vex()
        end
 
 
-    function mySpells:checkIfSpellListKillsATarget(target)
-        for _,v in pairs(self:spellsInRangeOfTarget(target)) do
+
+    function mySpells:checkIfSpellListKillsATarget(spellList, target)
+        for _,v in pairs(spellList) do
             local totalDps = 0
+            local spellsToKillCount = 0
             local spellsToCast = {}
             local targetHp = target.health
             print(targetHp)
@@ -177,11 +166,10 @@ function vex()
                 print("Spell "..v.."can kill, cast")
                 self:castSpellOnTarget((self[v].spell), target.position)
             elseif totalDps > targetHp then
-                for _,v in pairs(totalDps) do
+                for _,v in pairs(spellsToCast) do
                     self:castSpellOnTarget((self[v].spell), target.position)
                 end
             else
-
                 totalDps = totalDps + self:getSpellDamageToTarget(v,target)
                 table.insert(spellsToCast, v)
             end
@@ -189,67 +177,125 @@ function vex()
         print(totalDps)
     end
 
-    function mySpells:CheckIfSpellListKillsATargetInEnemyList()
-        for _,v in pairs(createEnemiesList()) do
-            self:checkIfSpellListKillsATarget(v)
-        end
+    --if features.orbwalker:get_mode() == Combo_key
+    --if target out of range but killable
+
+
+
+
+    function mySpells:isSpellReady(spell)
+        return self[spell].spell:is_ready()
     end
-
-
-    function mySpells:totalComboDamage()
-        self.totalComboDamage = 0
-        for k,v in pairs(spellsList) do
-            print(v)
-            spellValues, spellSlot = mySpells:selectSpell(v)
-            self[v].TotalDamage = mySpells:getSpellDamage(v)
-            if spellSlot:is_ready() then
-                    self.totalComboDamage = self.totalComboDamage + self[v].TotalDamage
-                    --end
-            end
-        end
-        return self.totalComboDamage
-    end
-
-
-    function mySpells:getTotalComboDamageTarget(target)
-        local currentTotalDamage = mySpells:totalComboDamage()
-        return currentTotalDamage * getTargetMr(target)
-    end
-
-
 
     function mySpells:castSpellOnTarget(spellToCast,target)
-        self.selectSpell('q')
         local castSpellSlot = self[spellToCast].spell
-        print(castSpellSlot)
-        g_input:cast_spell((castSpellSlot), target.position)
+        print('casting spell '..spellToCast)
+        if target ~= nil then
+            g_input:cast_spell((castSpellSlot), target.position)
+        else
+            g_input:cast_spell(castSpellSlot)
+        end
+    end
+
+
+    function standardCombo()
+            mySpells:refreshSpells()
+            local target = features.target_selector:get_default_target()
+            for _, spell in pairs(spellsList) do
+                if spell ~= 'r' then
+                    if mySpells:isSpellInRange(spell, target) then
+                        if spell ~= 'w' then
+                            mySpells:castSpellOnTarget(spell, target)
+                        else
+                            mySpells:castSpellOnTarget(spell, nil)
+                        end
+                    end
+                end
+            end
     end
 
 
 
-    for k,v in pairs(createEnemiesList()) do
-        --mySpells:castSpellOnTarget('q',v)
-        mySpells:CheckIfSpellListKillsATargetInEnemyList()
-    end
-
+    function womboCombo()
+        if features.orbwalker:get_mode() == Combo_key then
+            mySpells:refreshSpells()
+            local totalDamageToTarget = 0
+                for _,vTarget in pairs(createEnemiesList())
+                do
+                    print('targets current health '..vTarget.health)
+                    if mySpells:isSpellInRange('q', vTarget) == false then
+                        print('out of Q range')
+                        print(mySpells:isSpellInRange('r',vTarget))
+                        if mySpells:isSpellInRange('r',vTarget) == true then
+                            print('in R range')
+                            for _,vSpell in pairs(spellsList)
+                            do
+                                totalDamageToTarget = totalDamageToTarget + mySpells:getSpellDamageToTarget(vSpell,vTarget)
+                            end
+                            print('total damage done to target '..totalDamageToTarget)
+                            if totalDamageToTarget > vTarget.health then
+                                print('total damage higher than target health, execute')
+                                mySpells:castSpellOnTarget('r', vTarget)
+                                mySpells:castSpellOnTarget('r', nil)
+                                for _,vSpell in pairs(spellsList)
+                                do
+                                    mySpells:castSpellOnTarget(vSpell, vTarget)
+                                end
+                            end
+                        end
+                    else
+                        standardCombo()
+                    end
+                    end
+               end
+        end
 
 
     --cheat.register_callback("render", function()
     --    g_render:text(vec2:new(150, 50), color:new(255, 255, 255), mySpells:CheckIfSpellListKillsATargetInEnemyList(), "roboto-regular", 60)
     --end)
 
+    --mySpells:refreshSpells()
+
+    --mySpells:CheckIfSpellListKillsATargetInEnemyList(enemies:createEnemiesList(),spellList)
+
+    --cheat.register_callback('feature', function()
+    --    womboCombo()
+    --end
+    --)
+
+    Combo_key = 1
+    Clear_key = 3
+    Harass_key = 4
+
+    cheat.register_callback('feature', function()
+        womboCombo()
+    end
+    )
+
+
 end
-
-
-    --
-    --cheat.register_module(
-    --        {
-    --            champion_name = "Vex"
-    --
-    --        })
-
-
-
 vex()
 
 
+
+
+
+
+--function mySpells:totalComboDamage()
+--    self.totalComboDamage = 0
+--    for k,v in pairs(spellsList) do
+--        print(v)
+--        spellValues, spellSlot = mySpells:selectSpell(v)
+--        self[v].TotalDamage = mySpells:getSpellDamage(v)
+--        if spellSlot:is_ready() then
+--                self.totalComboDamage = self.totalComboDamage + self[v].TotalDamage
+--                --end
+--        end
+--    end
+--    return self.totalComboDamage
+--end
+
+--cheat.register_callback("render", function()
+--    g_render:text(vec2:new(150, 50), color:new(255, 255, 255), mySpells:CheckIfSpellListKillsATargetInEnemyList(), "roboto-regular", 60)
+--end)
