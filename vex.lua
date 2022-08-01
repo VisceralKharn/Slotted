@@ -3,11 +3,7 @@ print('vex loaded')
 
 --g_input:cast_spell((test.spell), nil)
 function createEnemiesList()
-    local enemiesList = {}
-    for k,v in pairs(features.entity_list:get_enemies()) do
-        table.insert(enemiesList, v)
-    end
-    return enemiesList
+    return features.entity_list:get_enemies()
 end
 
 function getTargetMr(target)
@@ -26,6 +22,7 @@ function vex()
             lastCast = 0,
             manaCost = {45,50,55,60,65},
             spell = myChampSpellBook:get_spell_slot(e_spell_slot.q),
+            spellSlot = e_spell_slot.q,
             apRatio = .7,
             Range = 1200,
             Width = 360,
@@ -39,6 +36,7 @@ function vex()
             lastCast = 0,
             manaCost = {75,75,75,75,75},
             spell = myChampSpellBook:get_spell_slot(e_spell_slot.w),
+            spellSlot = e_spell_slot.w,
             apRatio = .3,
             Range = 0,
             Width = 550,
@@ -51,6 +49,7 @@ function vex()
             lastCast = 0,
             manaCost = {70,80,90,100,110},
             spell = myChampSpellBook:get_spell_slot(e_spell_slot.e),
+            spellSlot = e_spell_slot.e,
             apRatio = {.4,.45,.5,.55,.6},
             Range = 1200,
             Width = 360,
@@ -63,6 +62,7 @@ function vex()
             lastCast = 0,
             manaCost = {100, 100, 100},
             spell = myChampSpellBook:get_spell_slot(e_spell_slot.r),
+            spellSlot = e_spell_slot.r,
             apRatio = {.2, .5},
             Range = { 2000, 2500, 3000 },
             Width = 360,
@@ -218,7 +218,7 @@ function vex()
 
     function mySpells:castSpellOnTarget(spellToCast,target)
         if self:canCast(spellToCast) then
-                local castSpellSlot = self[spellToCast].spell
+                local castSpellSlot = self[spellToCast].spellSlot
                 print('casting spell '..spellToCast)
                 if target ~= nil then
                     g_input:cast_spell((castSpellSlot), target.position)
