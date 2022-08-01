@@ -25,7 +25,7 @@ function vex()
         q = {
             lastCast = 0,
             manaCost = {45,50,55,60,65},
-            spell = e_spell_slot.q,
+            spell = myChampSpellBook:get_spell_slot(e_spell_slot.q),
             apRatio = .7,
             Range = 1200,
             Width = 360,
@@ -38,7 +38,7 @@ function vex()
         w = {
             lastCast = 0,
             manaCost = {75,75,75,75,75},
-            spell = e_spell_slot.w,
+            spell = myChampSpellBook:get_spell_slot(e_spell_slot.w),
             apRatio = .3,
             Range = 0,
             Width = 550,
@@ -50,7 +50,7 @@ function vex()
         e = {
             lastCast = 0,
             manaCost = {70,80,90,100,110},
-            spell = e_spell_slot.e,
+            spell = myChampSpellBook:get_spell_slot(e_spell_slot.e),
             apRatio = {.4,.45,.5,.55,.6},
             Range = 1200,
             Width = 360,
@@ -62,7 +62,7 @@ function vex()
         r = {
             lastCast = 0,
             manaCost = {100, 100, 100},
-            spell = e_spell_slot.r,
+            spell = myChampSpellBook:get_spell_slot(e_spell_slot.r),
             apRatio = {.2, .5},
             Range = { 2000, 2500, 3000 },
             Width = 360,
