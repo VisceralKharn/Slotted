@@ -197,6 +197,7 @@ function mySpells:placeBarrel()
                 table.insert(barrels, barrelIdx)
             end
             if target ~= nil then
+                g_render:line(barrelLoc:to_screen(), target.position:to_screen(), Red,3)
                 local lineFromBarrelToTarget = rectangle_t:new(barrelLoc, target.position, 1)
                 local lineDistance = getDistance(barrelLoc, target.position)
             end
