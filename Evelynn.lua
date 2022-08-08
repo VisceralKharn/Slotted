@@ -74,7 +74,7 @@ local mySpells = {
         spellSlot = e_spell_slot.r,
         apRatio = .6,
         empoweredRatio = 1.8,
-        Range = { 500 },
+        Range =  500 ,
         Width = 360,
         Speed = 1600,
         Level = 0,
@@ -158,13 +158,16 @@ end
 
 function mySpells:qSpell()
     local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
+    if  mode == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             if self:canCast('q') then
                 self:castSpellOnTarget('q',target)
             end
         end
+    end
+    if mode == Clear_key then
+
     end
 end
 
