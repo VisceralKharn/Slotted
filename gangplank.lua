@@ -216,6 +216,9 @@ function mySpells:placeBarrel()
                 if getDistance(g_local.position, target.position) <= self['q'].Width * 2 then
                     if self:checkNumberOfActiveBarrels() == 0 then
                         self:castSpellLocation('e', g_local.position)
+                    else
+                        --self:castSpellLocation('e',
+                                print(target.position)
                     end
 
 
