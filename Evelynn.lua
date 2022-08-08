@@ -206,7 +206,8 @@ function mySpells:rSpell()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['r'].Range then
             local rBaseDamage =  (g_local:get_ability_power() * self['r'].apRatio) + self['r'].Base[self['r'].Level]
             if target.health / target.max_health <= .3 then
-                local rBaseDamage = rBaseDamage + (g_local:get_ability_power() * self['r'].empoweredRatio) + self['r'].empoweredBase[self['r'].Level]
+                --local rBaseDamage = rBaseDamage + (g_local:get_ability_power() * self['r'].empoweredRatio) + self['r'].empoweredBase[self['r'].Level]
+                local rBaseDamage = (g_local:get_ability_power() * self['r'].empoweredRatio) + self['r'].empoweredBase[self['r'].Level]
             end
             local rDamageToTarget = getTargetMr(target) * rBaseDamage
             if rDamageToTarget > target.health then
