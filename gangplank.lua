@@ -178,17 +178,16 @@ end
 function mySpells:getActiveBarrels()
     for k,v in pairs(features.entity_list:get_enemy_minions()) do
         if v:get_object_name() == 'GangplankBarrel' and v:is_targetable() then
-            print(v)
-            barrels[v] = v
+            barrels[v.index] = v
         end
     end
     for k,v in pairs(barrels) do
-        local barrel = features.entity_list:get_by_index(v)
+        local barrel = v --features.entity_list:get_by_index(v)
         if barrel == nil then
-            print('remove barrel with index '..k.index)
+            print('remove barrel with index '..k)
             table.removeKey(barrels,k)
-        elseif barrel:is_targetable() == false then
-            print('remove barrel with index '..k.index)
+        elseif barrel:is_alive() == false then
+            print('remove barrel with index '..k)
             table.removeKey(barrels,k)
         end
     end
@@ -239,9 +238,9 @@ function drawLineFromBarrelToTarget()
     if features.orbwalker:get_mode() == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil then
-            for k, barrelPos in pairs(barrels) do
-                if barrelPos ~= nil then
-                    g_render:line(barrelPos:to_screen(), target.position:to_screen(), Red,3)
+            for k,v in pairs(barrels) do
+                if v ~= nil then
+                    g_render:line(v.position:to_screen(), target.position:to_screen(), Red,3)
                 end
             end
         end
