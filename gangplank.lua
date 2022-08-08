@@ -167,17 +167,33 @@ function mySpells:numberOfECharges()
 end
 
 
---function mySpells:getActiveBarrels()
---    local activeBarrels = { }
---    features.entity_list:force_update()
---    for k,v in pairs(createEnemyMinionsList()) do
---        if v:get_object_name() == 'GangplankBarrel' then
---            print('barrel found')
---            table.insert(activeBarrels, v)
---        end
---    return activeBarrels
---    end
---end
+
+
+function table.removeKey(table, key)
+    local element = table[key]
+    table[key] = nil
+    return element
+end
+
+function mySpells:getActiveBarrels()
+    for k,v in pairs(features.entity_list:get_enemy_minions()) do
+        if v:get_object_name() == 'GangplankBarrel' and v:is_targetable() then
+            print(v)
+            barrels[v] = v
+        end
+    end
+    for k,v in pairs(barrels) do
+        local barrel = features.entity_list:get_by_index(v)
+        if barrel == nil then
+            print('remove barrel with index '..k.index)
+            table.removeKey(barrels,k)
+        elseif barrel:is_targetable() == false then
+            print('remove barrel with index '..k.index)
+            table.removeKey(barrels,k)
+        end
+    end
+end
+
 
 
 function mySpells:checkNumberOfActiveBarrels()
@@ -192,45 +208,40 @@ end
 
 
 
-
 function mySpells:placeBarrel()
+    self:getActiveBarrels()
     if features.orbwalker:get_mode() == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil then
             if self:numberOfECharges() >= 2 then
                 if getDistance(g_local.position, target.position) <= self['q'].Width * 2 then
                     if self:checkNumberOfActiveBarrels() == 0 then
-                        local barrelLoc = self:castSpellLocation('e', g_local.position)
-                        local barrelIdx = g_local:get_spell_book():get_spell_cast_info().missile_index or nil
-                        if  barrelIdx ~= nil then
-                            print('inserting initial barrel to barrels')
-                            barrels['0'] = {barrelIdx, barrelLoc}
-                        end
+                        self:castSpellLocation('e', g_local.position)
                     end
-                    if self:checkNumberOfActiveBarrels() > 1 then
-                        local barrelLoc = self:castSpellLocation('e', (target.position) * .66)
-                        print(target.position)
-                        print(barrelLoc)
-                        local barrelIdx = g_local:get_spell_book():get_spell_cast_info().missile_index or nil
 
-                        if  barrelIdx ~= nil then
-                            table.insert(barrels, {barrelIdx, barrelLoc})
-                        end
-                    end
+
+
                 end
+
+
             end
         end
     end
 end
 
 
+
+
+
+
+
 function drawLineFromBarrelToTarget()
     if features.orbwalker:get_mode() == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil then
-            for k, barrel in pairs(barrels) do
-                if barrel[2] ~= nil then
-                    g_render:line(barrel[2]:to_screen(), target.position:to_screen(), Red,3)
+            for k, barrelPos in pairs(barrels) do
+                if barrelPos ~= nil then
+                    g_render:line(barrelPos:to_screen(), target.position:to_screen(), Red,3)
                 end
             end
         end
@@ -240,9 +251,9 @@ end
 
 function mySpells:qSpell()
     local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key then
+    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
         local target = features.target_selector:get_default_target()
-        if target ~= nil then
+        if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             self:castSpellOnTarget('q',target)
         end
     end
@@ -250,23 +261,15 @@ function mySpells:qSpell()
 end
 
 
-function mySpells:removeBarrels()
-    for k,v in pairs(barrels) do
-        if v[2] == nil then
-            table.remove(barrels, k)
-        end
-        if v[2] ~= nil then
-            if getDistance(g_local.position, v[2]) > 1000 then
-                table.remove(barrels, k)
-            end
-        end
-
-    end
-end
 
 cheat.register_callback("render", drawLineFromBarrelToTarget)
 --cheat.register_callback('feature', function()
---    mySpells:removeBarrels()
+--    --mySpells:removeBarrels()
+--    for k,v in pairs(features.entity_list:get_enemy_minions()) do
+--        if v:get_object_name() == 'GangplankBarrel'
+--            then print('GangplankBarrel found')
+--        end
+--    end
 --end
 --)
 
