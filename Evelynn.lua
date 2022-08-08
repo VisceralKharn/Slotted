@@ -33,7 +33,7 @@ local mySpells = {
         spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.q),
         spellSlot = e_spell_slot.q,
         apRatio = 1,
-        Range = 625,
+        Range = 800,
         Width = 360,
         Speed = 2600,
         Level = 0,
@@ -47,7 +47,7 @@ local mySpells = {
         spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.w),
         spellSlot = e_spell_slot.w,
         apRatio = .3,
-        Range = 0,
+        Range = {1200 , 1300 , 1400 , 1500 , 1600},
         Width = 550,
         Speed = 10000,
         Level = 0,
@@ -60,7 +60,7 @@ local mySpells = {
         spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.e),
         spellSlot = e_spell_slot.e,
         apRatio = {.4,.45,.5,.55,.6},
-        Range = 1000,
+        Range = 210,
         Width = 345,
         Speed = 1600,
         Level = 0,
@@ -154,6 +154,47 @@ function mySpells:isSpellInRange(spell,target)
 end
 
 
+
+
+function mySpells:qSpell()
+    local mode = features.orbwalker:get_mode()
+    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
+        local target = features.target_selector:get_default_target()
+        if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
+            if self:canCast('q') then
+                self:castSpellOnTarget('q',target)
+            end
+        end
+    end
+end
+
+function mySpells:wSpell()
+    local mode = features.orbwalker:get_mode()
+    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
+        self:refreshSpells()
+        local target = features.target_selector:get_default_target()
+        if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
+            if self:canCast('w') then
+                self:castSpellOnTarget('w',target)
+            end
+        end
+    end
+end
+
+function mySpells:eSpell()
+    local mode = features.orbwalker:get_mode()
+    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
+        local target = features.target_selector:get_default_target()
+        if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
+            if self:canCast('e') then
+                self:castSpellOnTarget('e',target)
+            end
+        end
+    end
+end
+
+
+
 function mySpells:rSpell()
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
@@ -179,17 +220,20 @@ cheat.register_module({
         mySpells:qSpell()
     end,
     spell_w = function()
-        mySpells:qSpell()
+        mySpells:wSpell()
     end,
     spell_e = function()
-
+        mySpells:eSpell()
     end ,
     spell_r = function()
         mySpells:rSpell()
     end,
     get_priorities = function()
         return {
-            "spell_r"
+        "spell_r",
+        "spell_w",
+        "spell_e",
+        "spell_q"
         }
     end
 })
