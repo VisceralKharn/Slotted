@@ -197,7 +197,7 @@ end
 
 
 cheat.register_module({
-    champion_name = "MasterYi",
+    champion_name = "Master_Yi",
     spell_q = function()
         mySpells:qSpell()
     end,
@@ -206,7 +206,7 @@ cheat.register_module({
     end,
     get_priorities = function()
         return {
-            "spell_r",
+            "spell_q",
             "spell_e"
         }
     end
