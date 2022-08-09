@@ -86,9 +86,20 @@ local mySpells = {
 }
 function mySpells:refreshSpells()
     self['q'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.q).level
+    self['q'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.r)
+    self['q'].spellSlot = e_spell_slot.q
+
     self['w'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.w).level
+    self['w'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.w)
+    self['w'].spellSlot = e_spell_slot.w
+
     self['e'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.e).level
+    self['e'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.e)
+    self['e'].spellSlot = e_spell_slot.e
+
     self['r'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.r).level
+    self['r'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.r)
+    self['r'].spellSlot = e_spell_slot.r
 end
 
 
@@ -111,7 +122,7 @@ end
 
 
 function mySpells:canCast(spell)
-    mySpells:refreshSpells()
+    self:refreshSpells()
     if self:isSpellReady(spell) and self:haveEnoughMana(spell) then
         return true
     else
@@ -171,9 +182,8 @@ end
 function mySpells:wSpell()
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        self:refreshSpells()
-        local target = features.target_selector:get_default_target()
         if self:canCast('w') then
+            local target = features.target_selector:get_default_target()
             if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
                 local wPred = features.prediction:predict(target.index, self['w'].Range[self['w'].Level], 4000, self['w'].Width, self['w'].CastTime, g_local.position)
                 if wPred == 4 then
