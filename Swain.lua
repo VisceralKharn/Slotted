@@ -34,7 +34,7 @@ local mySpells = {
         spellSlot = e_spell_slot.q,
         apRatio = 1,
         Range = 725,
-        Width = 360,
+        Width = 325,
         Speed = 2600,
         Level = 0,
         Base = {60, 105, 150, 195, 240},
@@ -173,9 +173,13 @@ function mySpells:wSpell()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
         self:refreshSpells()
         local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
-            if self:canCast('w') then
-                self:castSpellLocation('w',target.position)
+        if self:canCast('w') then
+            if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
+                local wPred = features.prediction:predict(target.index, self['w'].Range[self['w'].Level], 4000, self['w'].Width, self['w'].CastTime, g_local.position)
+                if wPred == 4 then
+                    self:castSpellLocation('w',target.position)
+
+                end
             end
         end
     end
