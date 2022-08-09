@@ -123,7 +123,7 @@ end
 function mySpells:castSpellOnTarget(spellToCast,target)
     local target = target or nil
     if self:canCast(spellToCast) then
-        local castSpellSlot = self[spellToCast].spellSloty
+        local castSpellSlot = self[spellToCast].spellSlot
         print('casting spell '..spellToCast)
         if target ~= nil then
             g_input:cast_spell((castSpellSlot), target)
