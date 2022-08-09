@@ -86,7 +86,7 @@ local mySpells = {
 }
 function mySpells:refreshSpells()
     self['q'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.q).level
-    self['q'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.r)
+    self['q'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.q)
     self['q'].spellSlot = e_spell_slot.q
 
     self['w'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.w).level
