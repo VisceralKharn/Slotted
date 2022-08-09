@@ -162,12 +162,9 @@ function mySpells:qSpell()
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             if self:canCast('q') then
-                self:castSpellOnTarget('q',target)
+                self:castSpellLocation('q',target.position)
             end
         end
-    end
-    if mode == Clear_key then
-
     end
 end
 
@@ -178,7 +175,7 @@ function mySpells:wSpell()
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
             if self:canCast('w') then
-                self:castSpellOnTarget('w',target)
+                self:castSpellLocation('w',target.position)
             end
         end
     end
@@ -190,7 +187,7 @@ function mySpells:eSpell()
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
             if self:canCast('e') then
-                self:castSpellOnTarget('e',target)
+                self:castSpellLocation('e',target.position)
             end
         end
     end
