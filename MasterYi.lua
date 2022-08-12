@@ -7,6 +7,7 @@ Green = color:new(0,255,0)
 Blue = color:new(0,0,200)
 barrels = {}
 
+print(g_local.champion_name)
 
 function createEnemiesList()
     return features.entity_list:get_enemies()
@@ -104,11 +105,7 @@ end
 
 
 function mySpells:isSpellReady(spell)
-    if self[spell].spell:is_ready() then
-        return true
-    else
-        return false
-    end
+    return self[spell].spell:is_ready()
 end
 
 
@@ -136,11 +133,7 @@ function mySpells:castSpellOnTarget(spellToCast,target)
     if self:canCast(spellToCast) then
         local castSpellSlot = self[spellToCast].spellSlot
         print('casting spell '..spellToCast)
-        if target ~= nil then
-            g_input:cast_spell((castSpellSlot), target)
-        else
-            g_input:cast_spell(castSpellSlot)
-        end
+        g_input:cast_spell((castSpellSlot), target)
     end
 end
 
@@ -168,6 +161,7 @@ end
 
 
 function mySpells:qSpell()
+    print('q')
     local mode = features.orbwalker:get_mode()
     if  mode == Combo_key then
         local target = features.target_selector:get_default_target()
@@ -197,7 +191,8 @@ end
 
 
 cheat.register_module({
-    champion_name = "Master_Yi",
+    champion_name = "MasterYi",
+
     spell_q = function()
         mySpells:qSpell()
     end,
