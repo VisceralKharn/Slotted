@@ -159,7 +159,7 @@ end
 function mySpells:getSpellDamage(spell)
     self:refreshSpells()
     local currentBase = self[spell].Base[self[spell].Level]
-    return ( myChamp:get_ability_power() * self[spell].apRatio) + currentBase
+    return ( g_local:get_ability_power() * self[spell].apRatio) + currentBase
 end
 
 
