@@ -233,9 +233,9 @@ cheat.register_module({
     end,
     get_priorities = function()
         return {
-            "spell_q",
-            "spell_w",
-            "spell_e",
+            --"spell_q",
+            --"spell_w",
+            --"spell_e",
             "spell_r"
 
         }
