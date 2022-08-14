@@ -209,7 +209,8 @@ function mySpells:checkNumberOfActiveBarrelsInRange()
     self:getActiveBarrels()
     local activeBarrels = 0
     for k,v in pairs(barrels) do
-        if getDistance(g_local.position, v.position) <- self['q'].Width then
+        print(getDistance(g_local.position, v.position))
+        if getDistance(g_local.position, v.position) <= self['q'].Range then
             activeBarrels = activeBarrels + 1
 
         end
@@ -226,7 +227,9 @@ function divideVec(vecPrimary, vecSecondary, distanceDenominator)
 end
 
 
-
+function addDistToVec(vec, distToAdd)
+    return vec3:new(vec.x + distToAdd, vec.y + distToAdd, vec.z)
+end
 
 
 function mySpells:placeBarrel()
@@ -236,14 +239,20 @@ function mySpells:placeBarrel()
             if self:numberOfECharges() >= 2 then
                 if getDistance(g_local.position, target.position) <= self['q'].Width * 2 then
                     if self:checkNumberOfActiveBarrelsInRange() == 0 then
+                        print('cast on me')
                         self:castSpellLocation('e', g_local.position)
                     else
+                        print('cast to target')
                         --local closestBarrel = self:getClosestBarrel()
                         --furthest a barrel can go is .66 of distance from me to target
                         --furthest for closest barrel to target is .5
                         --distance of 2 barrels is 690
                         local distanceDivided = getDistance(g_local.position, target.position) / self['e'].Width
-                        self:castSpellLocation('e', divideVec(g_local.position, target.position, distanceDivided))
+                        local castELoc = divideVec(g_local.position, target.position, distanceDivided)
+                        local castELocDist = getDistance(castELoc, target.position)
+                        local castELoc = addDistToVec(castELoc, castELocDist)
+                        --self:castSpellLocation('e', divideVec(g_local.position, target.position, distanceDivided))
+                        self:castSpellLocation('e', castELoc)
                     end
                 end
             end
