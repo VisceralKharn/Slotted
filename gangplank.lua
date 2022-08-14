@@ -85,9 +85,20 @@ local mySpells = {
 }
 function mySpells:refreshSpells()
     self['q'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.q).level
+    self['q'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.q)
+    self['q'].spellSlot = e_spell_slot.q
+
     self['w'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.w).level
+    self['w'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.w)
+    self['w'].spellSlot = e_spell_slot.w
+
     self['e'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.e).level
+    self['e'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.e)
+    self['e'].spellSlot = e_spell_slot.e
+
     self['r'].Level = g_local:get_spell_book():get_spell_slot(e_spell_slot.r).level
+    self['r'].spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.r)
+    self['r'].spellSlot = e_spell_slot.r
 end
 
 
@@ -110,7 +121,7 @@ function mySpells:haveEnoughMana(spell)
 end
 
 function mySpells:canCast(spell)
-    mySpells:refreshSpells()
+    self:refreshSpells()
     if self:isSpellReady(spell) and self:haveEnoughMana(spell) then
         return true
     else
@@ -123,11 +134,7 @@ function mySpells:castSpellOnTarget(spellToCast,target)
     if self:canCast(spellToCast) then
         local castSpellSlot = self[spellToCast].spellSlot
         print('casting spell '..spellToCast)
-        if target ~= nil then
-            g_input:cast_spell((castSpellSlot), target)
-        else
-            g_input:cast_spell(castSpellSlot)
-        end
+        g_input:cast_spell((castSpellSlot), target)
     end
 end
 
@@ -175,9 +182,11 @@ function table.removeKey(table, key)
     return element
 end
 
+
+
 function mySpells:getActiveBarrels()
     for k,v in pairs(features.entity_list:get_enemy_minions()) do
-        if v:get_object_name() == 'GangplankBarrel' and v:is_targetable() then
+        if  v:get_object_name() == 'GangplankBarrel' and v:is_targetable() then
             barrels[v.index] = v
         end
     end
@@ -195,12 +204,25 @@ end
 
 
 
-function mySpells:checkNumberOfActiveBarrels()
+
+function mySpells:checkNumberOfActiveBarrelsInRange()
+    self:getActiveBarrels()
     local activeBarrels = 0
     for k,v in pairs(barrels) do
+        if getDistance(g_local.position, v.position) <- self['q'].Width then
             activeBarrels = activeBarrels + 1
+
+        end
     end
     return activeBarrels
+end
+
+
+function divideVec(vecPrimary, vecSecondary, distanceDenominator)
+    local subtractVec = vec3:new(vecPrimary.x - vecSecondary.x, vecPrimary.y - vecSecondary.y, vecPrimary.z - vecSecondary.z)
+    local newVec = vec3:new(subtractVec.x / distanceDenominator, subtractVec.y / distanceDenominator, subtractVec.z / distanceDenominator)
+    local newVec = vec3:new(newVec.x + vecSecondary.x, newVec.y + vecSecondary.y, newVec.z + vecSecondary.z)
+    return newVec
 end
 
 
@@ -208,31 +230,26 @@ end
 
 
 function mySpells:placeBarrel()
-    self:getActiveBarrels()
     if features.orbwalker:get_mode() == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil then
             if self:numberOfECharges() >= 2 then
                 if getDistance(g_local.position, target.position) <= self['q'].Width * 2 then
-                    if self:checkNumberOfActiveBarrels() == 0 then
+                    if self:checkNumberOfActiveBarrelsInRange() == 0 then
                         self:castSpellLocation('e', g_local.position)
                     else
-                        --self:castSpellLocation('e',
-                                print(target.position)
+                        --local closestBarrel = self:getClosestBarrel()
+                        --furthest a barrel can go is .66 of distance from me to target
+                        --furthest for closest barrel to target is .5
+                        --distance of 2 barrels is 690
+                        local distanceDivided = getDistance(g_local.position, target.position) / self['e'].Width
+                        self:castSpellLocation('e', divideVec(g_local.position, target.position, distanceDivided))
                     end
-
-
-
                 end
-
-
             end
         end
     end
 end
-
-
-
 
 
 
@@ -253,7 +270,7 @@ end
 
 function mySpells:qSpell()
     local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
+    if mode == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             self:castSpellOnTarget('q',target)
@@ -278,7 +295,7 @@ cheat.register_callback("render", drawLineFromBarrelToTarget)
 cheat.register_module({
     champion_name = "Gangplank",
     spell_e = function()
-        local barrelIdx = mySpells:placeBarrel()
+        mySpells:placeBarrel()
     end ,
     spell_q = function()
         mySpells:qSpell()
