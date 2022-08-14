@@ -237,7 +237,7 @@ function mySpells:placeBarrel()
         local target = features.target_selector:get_default_target()
         if target ~= nil then
             if self:numberOfECharges() >= 2 then
-                if getDistance(g_local.position, target.position) <= self['q'].Width * 2 then
+                if getDistance(g_local.position, target.position) <= self['e'].Width * 2 then
                     if self:checkNumberOfActiveBarrelsInRange() == 0 then
                         print('cast on me')
                         self:castSpellLocation('e', g_local.position)
@@ -245,12 +245,11 @@ function mySpells:placeBarrel()
                         print('cast to target')
                         --local closestBarrel = self:getClosestBarrel()
                         --furthest a barrel can go is .66 of distance from me to target
-                        --furthest for closest barrel to target is .5
                         --distance of 2 barrels is 690
-                        local distanceDivided = getDistance(g_local.position, target.position) / self['e'].Width
+                        local distanceDivided = getDistance(g_local.position, target.position) / (self['e'].Width * 2)
                         local castELoc = divideVec(g_local.position, target.position, distanceDivided)
-                        local castELocDist = getDistance(castELoc, target.position)
-                        local castELoc = addDistToVec(castELoc, castELocDist)
+                        --local castELocDist = getDistance(castELoc, target.position)
+                        --local castELoc = addDistToVec(castELoc, castELocDist)
                         --self:castSpellLocation('e', divideVec(g_local.position, target.position, distanceDivided))
                         self:castSpellLocation('e', castELoc)
                     end
