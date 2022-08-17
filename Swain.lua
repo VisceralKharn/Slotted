@@ -61,8 +61,8 @@ local mySpells = {
         spellSlot = e_spell_slot.e,
         apRatio = {.4,.45,.5,.55,.6},
         Range = 850,
-        Width = 345,
-        Speed = 1600,
+        Width = 170,
+        Speed = 935,
         Level = 0,
         Base = {50, 70, 90, 110, 130},
         CastTime = 0.15,
@@ -80,7 +80,7 @@ local mySpells = {
         Level = 0,
         Base = {125 , 250 , 375 },
         empoweredBase = {300,600,900},
-        CastTime = 0.15,
+        CastTime = 0.25,
         TotalDamage = 0 },
     totalComboDamage = 0
 }
@@ -164,7 +164,10 @@ function mySpells:isSpellInRange(spell,target)
     end
 end
 
-
+function mySpells:predPosition(spell,target)
+    local pred = features.prediction:predict(target.index, self[spell].Range, self[spell].Speed, self[spell].Width, self[spell].CastTime, g_local.position)
+    return pred
+end
 
 
 function mySpells:qSpell()
@@ -200,8 +203,9 @@ function mySpells:eSpell()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
+            local ePred = self:predPosition('e',target)
             if self:canCast('e') then
-                self:castSpellLocation('e',target.position)
+                self:castSpellLocation('e', ePred.position)
             end
         end
     end
