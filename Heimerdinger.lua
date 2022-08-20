@@ -104,11 +104,7 @@ end
 
 
 function mySpells:isSpellReady(spell)
-    if self[spell].spell:is_ready() then
-        return true
-    else
-        return false
-    end
+    return self[spell].spell:is_ready()
 end
 
 
@@ -135,7 +131,7 @@ function mySpells:castSpellOnTarget(spellToCast,target)
     local target = target or nil
     if self:canCast(spellToCast) then
         local castSpellSlot = self[spellToCast].spellSlot
-        g_input:cast_spell((castSpellSlot), target)
+        g_input:cast_spell(castSpellSlot, target)
     end
 end
 
@@ -143,7 +139,7 @@ end
 function mySpells:castSpellLocation(spellToCast,location)
     if self:canCast(spellToCast) then
         local castSpellSlot = self[spellToCast].spellSlot
-        g_input:cast_spell((castSpellSlot), location)
+        g_input:cast_spell(castSpellSlot, location)
     end
 end
 
