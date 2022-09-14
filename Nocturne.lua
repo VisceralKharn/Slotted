@@ -158,27 +158,22 @@ function mySpells:predPosition(spell,target)
 end
 
 
-function mySpells:qSpell()
+function mySpells:qSpell(target)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
-            if self:canCast('q') then
-                local predPos = self:predPosition('q', target)
-                self:castSpellLocation('q',predPos.position)
-            end
+            local predPos = self:predPosition('q', target)
+            self:castSpellLocation('q',predPos.position)
+
         end
     end
 end
 
-function mySpells:eSpell()
+function mySpells:eSpell(target)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
-            if self:canCast('e') then
-                self:castSpellOnTarget('e',target)
-            end
+            self:castSpellOnTarget('e',target)
         end
     end
 end
@@ -189,7 +184,10 @@ end
 cheat.register_module({
     champion_name = "Nocturne",
     spell_q = function()
-        mySpells:qSpell()
+        mySpells:qSpell(features.target_selector:get_default_target())
+    end,
+    spell_e = function()
+        mySpells:eSpell(features.target_selector:get_default_target())
     end,
     get_priorities = function()
         return {
