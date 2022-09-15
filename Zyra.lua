@@ -48,7 +48,7 @@ local mySpells = {
         spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.w),
         spellSlot = e_spell_slot.w,
         apRatio = .3,
-        Range = 650,
+        Range = 850,
         Width = 550,
         Speed = 10000,
         Level = 0,
@@ -174,17 +174,19 @@ function mySpells:getZyraCasts()
 end
 
 
-function mySpells:wSpell()
+function mySpells:wSpell(targetPosition)
     local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        if self:getZyraCasts() == true then
-            self:castSpellLocation('w', features.target_selector:get_default_target().position)
+    if mode == Harass_key or mode == Combo_key then
+        if getDistance(g_local.position, targetPosition) <= self['w'].Range then
+            if self:getZyraCasts() == true then
+                self:castSpellLocation('w', targetPosition)
+            end
         end
     end
 end
 
 wFunction = function()
-    mySpells:wSpell()
+    mySpells:wSpell(features.target_selector:get_default_target().position)
     --mySpells:getZyraCasts()
 end
 
