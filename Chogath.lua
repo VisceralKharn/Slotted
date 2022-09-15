@@ -163,81 +163,22 @@ function mySpells:getSpellDamage(spell)
 end
 
 
-
-function mySpells:qSpell()
-    local mode = features.orbwalker:get_mode()
-    if mode == Combo_key then
-        local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
-            if self:canCast('q') then
-                self:castSpellLocation('q',target.position)
-            end
-        end
-    end
-end
-
-
-function mySpells:wSpell()
-    print('w')
-    local mode = features.orbwalker:get_mode()
-    if mode == Combo_key then
-        local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range then
-            if self:canCast('w') then
-                self:castSpellLocation('w', target.position)
-            end
-        end
-    end
-end
-
-function mySpells:eSpell()
-    local mode = features.orbwalker:get_mode()
-    if mode == Combo_key then
-        local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
-            if self:canCast('e') then
-                self:castSpellOnTarget('e')
-            end
-        end
-    end
-end
-
-function mySpells:rSpell()
+function mySpells:rSpell(target)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
         local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['r'].Range then
-            if self:canCast('r') then
+
                 if self:getSpellDamage('r') > target.health then
                     self:castSpellOnTarget('r',target)
                 end
-            end
+
         end
     end
 end
 
+rFunction = function()
+    mySpells:rSpell(features.target_selector:get_default_target())
+end
 
-cheat.register_module({
-    champion_name = "Chogath",
-    spell_q = function()
-        mySpells:qSpell()
-    end,
-    spell_w = function()
-        mySpells:wSpell()
-    end,
-    spell_e = function()
-        mySpells:eSpell()
-    end,
-    spell_r = function()
-        mySpells:rSpell()
-    end,
-    get_priorities = function()
-        return {
-            --"spell_q",
-            --"spell_w",
-            --"spell_e",
-            "spell_r"
-
-        }
-    end
-})
+cheat.register_callback("feature", rFunction)
