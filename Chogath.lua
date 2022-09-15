@@ -166,7 +166,6 @@ end
 function mySpells:rSpell(target)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['r'].Range then
 
                 if self:getSpellDamage('r') > target.health then
