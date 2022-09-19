@@ -201,28 +201,25 @@ end
 cheat.register_module({
     champion_name = "Vex",
     spell_q = function()
-        if q_combo_box:get_value() then
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:qSpell(features.orbwalker:get_mode(), mySpells:predPosition('q', features.target_selector:get_default_target()))
             end
-
-        end
     end,
     spell_w = function()
-        if w_combo_box:get_value() then
+
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:wSpell(features.orbwalker:get_mode(), mySpells:predPosition('w', features.target_selector:get_default_target()))
             end
 
-        end
+
     end,
     spell_e = function()
-        if e_combo_box:get_value() then
+
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:eSpell(features.orbwalker:get_mode(), mySpells:predPosition('e', features.target_selector:get_default_target()))
             end
 
-        end
+        
     end,
     get_priorities = function()
         return {
