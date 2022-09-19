@@ -267,7 +267,7 @@ function mySpells:eSpell(target)
 
         local mode = features.orbwalker:get_mode()
         if mode == ComboKey or mode == FleeKey then
-            if position ~= nil and getDistance(g_local.position, position) <= self['e'].Range  then
+            if getDistance(g_local.position, position) <= self['e'].Range  then
                 self:castSpellLocation('e',target.position)
             end
         end
@@ -285,7 +285,7 @@ cheat.register_module({
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:qSpell(mySpells:predPosition('q', features.target_selector:get_default_target()))
             end
-            
+
         end
     end,
     spell_w = function()
@@ -299,6 +299,7 @@ cheat.register_module({
     spell_e = function()
         if e_combo_box:get_value() then
             if features.target_selector:get_default_target() ~= nil then
+
                 mySpells:eSpell(features.target_selector:get_default_target())
             end
 
