@@ -1,6 +1,8 @@
-Combo_key = 1
-Clear_key = 3
-Harass_key = 4
+ComboKey = 1
+LasthitKey = 2
+LaneclearKey = 3
+HarassKey = 4
+FleeKey = 5
 White = color:new(255,255,255)
 Red = color:new(255,0,0)
 Green = color:new(0,255,0)
@@ -30,12 +32,12 @@ local mySpells = {
     q = {
         lastCast = 0,
         manaCost = {45,50,55,60,65},
-        spell = myChampSpellBook:get_spell_slot(e_spell_slot.q),
+        spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.q),
         spellSlot = e_spell_slot.q,
         apRatio = .7,
         Range = 1200,
         Width = 360,
-        Speed = 1600,
+        Speed = 2400,
         Level = 0,
         Base = {60, 105, 150, 195, 240},
         CastTime = 0.15,
@@ -44,10 +46,10 @@ local mySpells = {
     w = {
         lastCast = 0,
         manaCost = {75,75,75,75,75},
-        spell = myChampSpellBook:get_spell_slot(e_spell_slot.w),
+        spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.w),
         spellSlot = e_spell_slot.w,
         apRatio = .3,
-        Range = 0,
+        Range = 475,
         Width = 550,
         Speed = 10000,
         Level = 0,
@@ -57,12 +59,12 @@ local mySpells = {
     e = {
         lastCast = 0,
         manaCost = {70,80,90,100,110},
-        spell = myChampSpellBook:get_spell_slot(e_spell_slot.e),
+        spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.e),
         spellSlot = e_spell_slot.e,
         apRatio = {.4,.45,.5,.55,.6},
-        Range = 1200,
-        Width = 360,
-        Speed = 1600,
+        Range = 800,
+        Width = 200,
+        Speed = 1300,
         Level = 0,
         Base = {50, 70, 90, 110, 130},
         CastTime = 0.15,
@@ -70,7 +72,7 @@ local mySpells = {
     r = {
         lastCast = 0,
         manaCost = {100, 100, 100},
-        spell = myChampSpellBook:get_spell_slot(e_spell_slot.r),
+        spell = g_local:get_spell_book():get_spell_slot(e_spell_slot.r),
         spellSlot = e_spell_slot.r,
         apRatio = {.2, .5},
         Range = { 2000, 2500, 3000 },
@@ -164,12 +166,12 @@ end
 
 
 function mySpells:qSpell(mode, predPos)
+    print(features.orbwalker:get_mode())
     if mode == ComboKey or mode == HarassKey then
+        print('q')
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['q'].Range then
-            if self:isMinionInWay('q',predPos.position) == false then
-                self:castSpellLocation('q',predPos.position)
+            self:castSpellLocation('q',predPos.position)
 
-            end
         end
     end
 end
@@ -177,10 +179,7 @@ end
 function mySpells:wSpell(mode, predPos)
     if mode == ComboKey or mode == HarassKey then
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['w'].Range then
-            if self:isMinionInWay('w',predPos.position) == false then
-                self:castSpellLocation('w',predPos.position)
-
-            end
+            self:castSpellOnTarget('w')
         end
     end
 end
@@ -188,10 +187,7 @@ end
 function mySpells:eSpell(mode, predPos)
     if mode == ComboKey or mode == HarassKey then
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
-            if self:isMinionInWay('e',predPos.position) == false then
-                self:castSpellLocation('e',predPos.position)
-
-            end
+            self:castSpellLocation('e',predPos.position)
         end
     end
 end
@@ -206,26 +202,21 @@ cheat.register_module({
             end
     end,
     spell_w = function()
-
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:wSpell(features.orbwalker:get_mode(), mySpells:predPosition('w', features.target_selector:get_default_target()))
             end
-
-
     end,
     spell_e = function()
-
             if features.target_selector:get_default_target() ~= nil then
                 mySpells:eSpell(features.orbwalker:get_mode(), mySpells:predPosition('e', features.target_selector:get_default_target()))
             end
-
-        
     end,
     get_priorities = function()
         return {
-            "spell_w",
             "spell_e",
-            "spell_q"
+            "spell_q",
+            "spell_w"
+
         }
     end
 })
