@@ -165,15 +165,20 @@ function mySpells:isSpellInRange(spell,target)
 end
 
 function mySpells:predPosition(spell,target)
-    local pred = features.prediction:predict(target.index, self[spell].Range, self[spell].Speed, self[spell].Width, self[spell].CastTime, g_local.position)
+
+    if spell == 'w' then
+        self:refreshSpells()
+        pred = features.prediction:predict(target.index, self[spell].Range[self[spell].Level], self[spell].Speed, self[spell].Width, self[spell].CastTime, g_local.position)
+    else
+        pred = features.prediction:predict(target.index, self[spell].Range, self[spell].Speed, self[spell].Width, self[spell].CastTime, g_local.position)
+    end
     return pred
 end
 
 
-function mySpells:qSpell()
+function mySpells:qSpell(target)
     local mode = features.orbwalker:get_mode()
     if  mode == Combo_key then
-        local target = features.target_selector:get_default_target()
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             if self:canCast('q') then
                 self:castSpellLocation('q',target.position)
@@ -182,30 +187,28 @@ function mySpells:qSpell()
     end
 end
 
-function mySpells:wSpell()
+function mySpells:wSpell(predPos)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
         if self:canCast('w') then
-            local target = features.target_selector:get_default_target()
-            if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range[self['w'].Level] then
-                local wPred = features.prediction:predict(target.index, self['w'].Range[self['w'].Level], 4000, self['w'].Width, self['w'].CastTime, g_local.position)
-                if wPred == 4 then
-                    self:castSpellLocation('w',target.position)
-
+            if predPos ~= nil and getDistance(g_local.position, predPos.position) <= self['w'].Range[self['w'].Level] then
+                print(predPos.hitchance)
+                if predPos.hitchance == 3 then
+                    self:castSpellLocation('w',predPos.position)
                 end
             end
         end
     end
 end
 
-function mySpells:eSpell()
+function mySpells:eSpell(predPos)
     local mode = features.orbwalker:get_mode()
     if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
-            local ePred = self:predPosition('e',target)
+
+        if predPos ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
+            print('e')
             if self:canCast('e') then
-                self:castSpellLocation('e', ePred.position)
+                self:castSpellLocation('e', predPos.position)
             end
         end
     end
@@ -213,24 +216,16 @@ end
 
 
 
-function mySpells:rSpell()
-    print('Hatcher was here')
-end
-
-
 cheat.register_module({
     champion_name = "Swain",
     spell_q = function()
-        mySpells:qSpell()
+        mySpells:qSpell(features.target_selector:get_default_target())
     end,
     spell_w = function()
-        mySpells:wSpell()
+        mySpells:wSpell(mySpells:predPosition('w', features.target_selector:get_default_target()))
     end,
     spell_e = function()
-        mySpells:eSpell()
-    end ,
-    spell_r = function()
-        mySpells:rSpell()
+        mySpells:eSpell(mySpells:predPosition('e', features.target_selector:get_default_target()))
     end,
     get_priorities = function()
         return {
