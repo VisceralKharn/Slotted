@@ -171,13 +171,6 @@ function mySpells:qSpell(mode, target)
 end
 
 
-function mySpells:wSpell(mode, target)
-    if mode == ComboKey or mode == HarassKey then
-        if target.position ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range then
-            self:castSpellOnTarget('w', target)
-        end
-    end
-end
 
 
 function mySpells:eSpell(mode, predPos)
@@ -188,7 +181,47 @@ function mySpells:eSpell(mode, predPos)
     end
 end
 
-print(g_local.champion_name.text)
+
+function mySpells:getFiddleWStatus()
+    local spellCastInfo = g_local:get_spell_book():get_spell_cast_info()
+    if spellCastInfo ~= nil then
+        local spellCastSlot = g_local:get_spell_book():get_spell_slot(spellCastInfo.slot)
+        if spellCastSlot ~= nil then
+            local spellSlotName = spellCastSlot:get_name()
+            if spellSlotName == 'FiddleSticksW' then
+                stopOrbWalker = true
+            else
+                stopOrbWalker = false
+            end
+            return stopOrbWalker
+        end
+    end
+end
+
+function mySpells:wSpell(mode, target)
+    if mode == ComboKey or mode == HarassKey then
+        if target.position ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range then
+            self:castSpellOnTarget('w', target)
+        end
+    end
+end
+
+
+function setOrbAllow(status)
+    if status == true then
+        status = false
+    else
+        status = true
+    end
+    features.orbwalker:allow_movement(status)
+    features.orbwalker:allow_attacks(status)
+end
+
+wFunction = function()
+    setOrbAllow(mySpells:getFiddleWStatus())
+end
+
+cheat.register_callback("feature", wFunction)
 
 cheat.register_module({
     champion_name = "FiddleSticks",
@@ -210,7 +243,8 @@ cheat.register_module({
     get_priorities = function()
         return {
             "spell_e",
-            "spell_q"
+            "spell_q",
+            "spell_w"
         }
     end
 })
