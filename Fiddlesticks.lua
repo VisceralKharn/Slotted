@@ -165,7 +165,7 @@ end
 function mySpells:qSpell(mode, target)
     if mode == ComboKey or mode == HarassKey then
         if target.position ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
-            if self:getFiddleWStatus() == false then
+            if self:getFiddleWStatus() ~= true then
                 self:castSpellOnTarget('q',target)
 
             end
@@ -179,7 +179,7 @@ end
 function mySpells:eSpell(mode, predPos)
     if mode == ComboKey or mode == HarassKey then
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
-            if self:getFiddleWStatus() == false then
+            if self:getFiddleWStatus() ~= true then
                 self:castSpellLocation('e',predPos.position)
 
             end
