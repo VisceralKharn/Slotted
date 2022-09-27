@@ -165,7 +165,10 @@ end
 function mySpells:qSpell(mode, target)
     if mode == ComboKey or mode == HarassKey then
         if target.position ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
-            self:castSpellOnTarget('q',target)
+            if self:getFiddleWStatus() == false then
+                self:castSpellOnTarget('q',target)
+
+            end
         end
     end
 end
@@ -176,7 +179,10 @@ end
 function mySpells:eSpell(mode, predPos)
     if mode == ComboKey or mode == HarassKey then
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
-            self:castSpellLocation('e',predPos.position)
+            if self:getFiddleWStatus() == false then
+                self:castSpellLocation('e',predPos.position)
+
+            end
         end
     end
 end
@@ -226,9 +232,9 @@ cheat.register_callback("feature", wFunction)
 cheat.register_module({
     champion_name = "FiddleSticks",
     spell_q = function()
-            if features.target_selector:get_default_target() ~= nil then
-                mySpells:qSpell(features.orbwalker:get_mode(), features.target_selector:get_default_target())
-            end
+        if features.target_selector:get_default_target() ~= nil then
+            mySpells:qSpell(features.orbwalker:get_mode(), features.target_selector:get_default_target())
+        end
     end,
     spell_w = function()
         if features.target_selector:get_default_target() ~= nil then
@@ -236,9 +242,9 @@ cheat.register_module({
         end
     end,
     spell_e = function()
-            if features.target_selector:get_default_target() ~= nil then
-                mySpells:eSpell(features.orbwalker:get_mode(), mySpells:predPosition('e', features.target_selector:get_default_target()))
-            end
+        if features.target_selector:get_default_target() ~= nil then
+            mySpells:eSpell(features.orbwalker:get_mode(), mySpells:predPosition('e', features.target_selector:get_default_target()))
+        end
     end,
     get_priorities = function()
         return {
