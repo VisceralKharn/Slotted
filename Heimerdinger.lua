@@ -162,24 +162,19 @@ function mySpells:isMinionInWay(spell,position)
     return features.prediction:minion_in_line(g_local.position, position, self[spell].Width)
 end
 
-function mySpells:qSpell()
-    local mode = features.orbwalker:get_mode()
-    if  mode == Combo_key then
-        local target = features.target_selector:get_default_target()
+function mySpells:qSpell(mode,target)
+    if mode == Combo_key then
         if target ~= nil and getDistance(g_local.position, target.position) <= self['q'].Range then
             self:castSpellLocation('q',g_local.position)
         end
     end
 end
 
-function mySpells:wSpell()
-    local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-            local target = features.target_selector:get_default_target()
-            if target ~= nil and getDistance(g_local.position, target.position) <= self['w'].Range then
-                local wPred = self:predPosition('w',target)
-                if self:isMinionInWay('w',wPred.position) == false then
-                    self:castSpellLocation('w',wPred.position)
+function mySpells:wSpell(mode, predPos)
+    if mode == Harass_key or mode == Combo_key then
+            if predPos ~= nil and getDistance(g_local.position, predPos.position) <= self['w'].Range then
+                if self:isMinionInWay('w',predPos.position) == false then
+                    self:castSpellLocation('w',predPos.position)
 
                 end
             end
@@ -187,13 +182,10 @@ function mySpells:wSpell()
 end
 
 
-function mySpells:eSpell()
-    local mode = features.orbwalker:get_mode()
-    if mode == Clear_key or mode == Harass_key or mode == Combo_key then
-        local target = features.target_selector:get_default_target()
-        if target ~= nil and getDistance(g_local.position, target.position) <= self['e'].Range then
-            local ePred = self:predPosition('e',target)
-            self:castSpellLocation('e', ePred.position)
+function mySpells:eSpell(mode, predPos)
+    if mode == Harass_key or mode == Combo_key then
+        if predPos ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
+            self:castSpellLocation('e', predPos.position)
         end
     end
 end
@@ -204,14 +196,18 @@ end
 cheat.register_module({
     champion_name = "Heimerdinger",
     spell_q = function()
-        mySpells:qSpell()
+        mySpells:qSpell(features.orbwalker:get_mode(),features.target_selector:get_default_target())
     end,
     spell_w = function()
-        mySpells:wSpell()
+        if features.target_selector:get_default_target() ~= nil then
+            mySpells:wSpell(features.orbwalker:get_mode(), mySpells:predPosition('w', features.target_selector:get_default_target()))
+        end
     end,
     spell_e = function()
-        mySpells:eSpell()
-    end ,
+        if features.target_selector:get_default_target() ~= nil then
+            mySpells:eSpell(features.orbwalker:get_mode(), mySpells:predPosition('e', features.target_selector:get_default_target()))
+        end
+    end,
     get_priorities = function()
         return {
             "spell_e",
