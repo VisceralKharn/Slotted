@@ -184,10 +184,17 @@ function mySpells:wSpell(mode, predPos)
     end
 end
 
+function mySpells:isMinionInWay(spell,position)
+    return features.prediction:minion_in_line(g_local.position, position, self[spell].Width)
+end
+
 function mySpells:eSpell(mode, predPos)
     if mode == ComboKey then
         if predPos.position ~= nil and getDistance(g_local.position, predPos.position) <= self['e'].Range then
-            self:castSpellLocation('e',predPos.position)
+            if self:isMinionInWay('w',predPos.position) == false then
+                self:castSpellLocation('e',predPos.position)
+                
+            end
         end
     end
 end
