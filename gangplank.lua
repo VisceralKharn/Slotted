@@ -101,6 +101,40 @@ function mySpells:refreshSpells()
     self['r'].spellSlot = e_spell_slot.r
 end
 
+function distance(x1, y1, z1, x2, y2, z2)
+  -- Calculates the distance between two points
+  return math.sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
+end
+
+function midpoint(x1, y1, z1, x2, y2, z2)
+  -- Calculates the midpoint between two points
+  return (x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2
+end
+
+function find_circles(x1, y1, z1, x2, y2, z2)
+  -- Calculates the center points and radii of the two circles
+  local d = distance(x1, y1, z1, x2, y2, z2)
+  local r = d / 2
+  local mx, my, mz = midpoint(x1, y1, z1, x2, y2, z2)
+
+  local h = math.sqrt((r^2) - ((d/2)^2))
+
+  local dx = (y1 - y2) / d
+  local dy = (x2 - x1) / d
+
+  local cx1 = mx + h*dx
+  local cy1 = my + h*dy
+  local cz1 = z1
+  local cx2 = mx - h*dx
+  local cy2 = my - h*dy
+  local cz2 = z1
+
+  print(string.format("Circle 1: (%.2f, %.2f, %.2f), radius: %.2f", cx1, cy1, cz1, r))
+  print(string.format("Circle 2: (%.2f, %.2f, %.2f), radius: %.2f", cx2, cy2, cz2, r))
+end
+
+-- Example usage:
+find_circles(0, 0, 0, 3, 4, 0)
 
 
 
